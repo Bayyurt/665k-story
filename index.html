@@ -748,6 +748,14 @@ go(0);
   demoSlide.querySelector('#dback').addEventListener('click',function(){frame.src='about:blank';goTo(all.indexOf(slides[9])>-1?9:0);});
   window.showDemo=showDemo;
 
+  /* 3b · Rail counter and total must include the demo page */
+  (function(){
+    var cnt=document.getElementById('cnt');if(!cnt)return;
+    var total=document.querySelectorAll('.slide').length;
+    function fix(){var t=(cnt.textContent||'').split('/');if(t.length===2){var a=t[0].trim();if(/^\d+$/.test(a))cnt.textContent=a+' / '+total;}}
+    fix();new MutationObserver(fix).observe(cnt,{childList:true,characterData:true,subtree:true});
+  })();
+
   /* 4 · Screenshot open behaviour: static deck keeps zoom; live ones go to demo on double click */
   document.addEventListener('dblclick',function(e){
     var live=e.target.closest('.shot.live');
