@@ -752,7 +752,13 @@ go(0);
   (function(){
     var cnt=document.getElementById('cnt');if(!cnt)return;
     var total=document.querySelectorAll('.slide').length;
-    function fix(){var t=(cnt.textContent||'').split('/');if(t.length===2){var a=t[0].trim();if(/^\d+$/.test(a))cnt.textContent=a+' / '+total;}}
+    var busy=false;
+    function fix(){
+      if(busy)return;busy=true;
+      var a=((cnt.textContent||'').split('/')[0]||'').trim();
+      if(/^\d+$/.test(a)&&a+' / '+total!==cnt.textContent)cnt.textContent=a+' / '+total;
+      busy=false;
+    }
     fix();new MutationObserver(fix).observe(cnt,{childList:true,characterData:true,subtree:true});
   })();
 
