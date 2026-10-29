@@ -213,6 +213,43 @@ ul.lessons li b{color:var(--ink)}
 .swipe-hint.on{opacity:1}
 @media (pointer:coarse){.shot::after{opacity:.9}}
 
+
+/* ══════════════ Live demo layer — styles ══════════════ */
+.shot.live{position:relative;outline:2px solid rgba(48,167,255,.55);outline-offset:-2px}
+.shot.live:hover{box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 0 2px rgba(48,167,255,.8)}
+.live-tag{position:absolute;top:34px;left:10px;z-index:3;background:#30a7ff;color:#04223a;font-weight:800;
+  font-size:.62rem;letter-spacing:.12em;padding:3px 8px;border-radius:6px;pointer-events:none}
+.shot-actions{display:flex;gap:10px;margin-block-start:12px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:.45em;background:#30a7ff;color:#04223a;border:0;border-radius:10px;
+  padding:.6rem .95rem;font:inherit;font-weight:700;font-size:.85rem;text-decoration:none;cursor:pointer;
+  min-height:40px;transition:transform .15s ease,filter .15s}
+.btn:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.btn.ghost{background:transparent;color:#cfe6ff;border:1px solid var(--line)}
+.btn:focus-visible{outline:2px solid #9fd6ff;outline-offset:2px}
+
+/* demo slide */
+.demo-slide{padding-top:clamp(14px,3vh,40px)}
+.demo-head{display:flex;gap:18px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;margin-bottom:12px}
+.demo-head h2{font-size:clamp(1.3rem,2.6vw,2.2rem);margin:0}
+.demo-tools{display:flex;gap:10px;flex-wrap:wrap}
+.demo-frame{position:relative;flex:1;min-height:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#071120}
+.demo-frame iframe{width:100%;height:100%;min-height:52vh;border:0;display:block;background:#071120}
+.demo-warn{position:absolute;inset:auto 12px 12px 12px;background:rgba(12,32,52,.96);border:1px solid var(--line);
+  border-radius:10px;padding:10px 12px;color:#cfe6ff;font-size:.82rem;line-height:1.4}
+
+/* phone: this deck is for a computer; say it once, kindly */
+.mobile-note{position:fixed;inset:0;z-index:80;background:rgba(4,10,18,.97);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:14px;padding:28px;text-align:center}
+.mobile-note b{font-size:1.15rem}
+.mobile-note span{color:var(--mut);max-width:32ch;line-height:1.5;font-size:.95rem}
+.mobile-note button{background:#30a7ff;color:#04223a;border:0;border-radius:10px;padding:.7rem 1.2rem;
+  font:inherit;font-weight:700;min-height:44px;cursor:pointer}
+@media (min-width:761px){.mobile-note{display:none}}
+
+/* phone mockups used as a live demo target */
+.phones.shot-like{position:relative;padding:10px;border:1px solid rgba(48,167,255,.5);border-radius:14px}
+.phones.shot-like .live-tag{top:6px;left:8px}
+
 </style>
 </head>
 <body>
@@ -621,6 +658,109 @@ go(0);
       document.querySelectorAll('#rail button')[(k+(dx<0?1:-1)+slides.length)%slides.length].click();
     }
   },{passive:true});
+})();
+</script>
+
+<script>
+/* ══════════════ Live demo layer — desktop first ══════════════
+   Every screenshot becomes a link to the running application.
+   "Abre" opens the real app in a new tab; "Aqui" embeds it on a demo page
+   inside the deck so you never leave the presentation. */
+(function(){
+  var DEMOS={
+    'channel-visibility':{title:'Channel Visibility · Angola',note:'Sell-out + shelf por loja, e ordem de visita sugerida.',url:'https://bayyurt.github.io/luanda-hustle-play/'},
+    'price-ladder':{title:'PriceLadder v2',note:'227 produtos; preços recolhidos no telemóvel; resultados em Excel.',url:'https://bayyurt.github.io/luanda-hustle-play/'},
+    'dashboard-665k':{title:'Dashboard Plano 665K',note:'Cada Nestlé House: alvo vs. venda vs. % do mês decorrido.',url:'https://bayyurt.github.io/luanda-hustle-play/'},
+    'raiz-do-problema':{title:'Raiz do Problema',note:'Diagnóstico por distribuidor + alerta pessoal ao FSM/RSM.',url:'https://bayyurt.github.io/luanda-hustle-play/'}
+  };
+  window.DEMOS=DEMOS;
+
+  var MOBILE=matchMedia('(max-width:760px), (pointer:coarse) and (max-height:900px)').matches;
+
+  /* 1 · Mobile-first note: this deck is meant for a laptop/projector */
+  if(MOBILE){
+    var bar=document.createElement('div');bar.className='mobile-note';
+    bar.innerHTML='<b>Apresentação para computador</b><span>Os demos e as aplicações abrem melhor num portátil ou projector.</span><button type="button">Continuar</button>';
+    document.body.appendChild(bar);
+    bar.querySelector('button').addEventListener('click',function(e){e.stopPropagation();bar.remove();});
+    document.addEventListener('click',function(e){if(e.target===bar)bar.remove();},true);
+  }
+
+  /* 2 · Which demo belongs to which screenshot */
+  var map=[
+    {slide:6,key:'channel-visibility'},   // From reports to tools
+    {slide:7,key:'price-ladder'},         // An app in every merchandiser's pocket
+    {slide:10,key:'dashboard-665k'},      // "Where each store should be."
+    {slide:11,key:'raiz-do-problema'}     // "Raiz do Problema"
+  ];
+  var slides=[].slice.call(document.querySelectorAll('.slide'));
+  map.forEach(function(m){
+    var s=slides[m.slide-1];if(!s)return;
+    var shot=s.querySelector('.shot')||s.querySelector('.phones');if(!shot)return;
+    if(shot.classList.contains('phones'))shot.classList.add('shot-like');
+    var d=DEMOS[m.key];
+    shot.classList.add('live');
+    shot.setAttribute('data-demo',m.key);
+    if(!shot.querySelector('.live-tag')){
+      var tag=document.createElement('span');tag.className='live-tag';tag.textContent='DEMO AO VIVO';
+      shot.appendChild(tag);
+    }
+    var caps=document.createElement('div');caps.className='shot-actions rv';
+    caps.style.transitionDelay='.6s';
+    var open=document.createElement('a');open.href=d.url;open.target='_blank';open.rel='noopener';
+    open.className='btn';open.textContent='Abrir aplicação ↗';
+    var here=document.createElement('button');here.type='button';here.className='btn ghost';here.textContent='Aqui ▶';
+    here.addEventListener('click',function(e){e.stopPropagation();showDemo(m.key);});
+    caps.appendChild(open);caps.appendChild(here);
+    var host=shot.parentNode;
+    host.insertBefore(caps,shot.nextSibling);
+    shot.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();showDemo(m.key);}});
+    shot.setAttribute('tabindex','0');
+  });
+
+  /* 3 · Demo page inside the deck: an extra slide, no need to leave */
+  var demoSlide=document.createElement('section');
+  demoSlide.className='slide demo-slide';
+  demoSlide.setAttribute('data-k','#30a7ff');
+  demoSlide.innerHTML='<div class="demo-head"><div><div class="kick">Demo ao vivo</div>'+
+    '<h2 id="dtitle">Aplicação</h2><p class="lead" id="dnote" style="margin-top:6px"></p></div>'+
+    '<div class="demo-tools"><a class="btn" id="dopen" target="_blank" rel="noopener">Abrir em nova aba ↗</a>'+
+    '<button class="btn ghost" type="button" id="dback">← Voltar à apresentação</button></div></div>'+
+    '<div class="demo-frame"><iframe id="dframe" title="Aplicação ao vivo" loading="lazy" referrerpolicy="no-referrer"></iframe>'+
+    '<div class="demo-warn" id="dwarn">Se a aplicação não aparecer aqui, o serviço bloqueia incorporação noutro site. Usa “Abrir em nova aba” — é o modo recomendado para a demo ao vivo.</div></div>';
+  slides[slides.length-1].parentNode.appendChild(demoSlide);
+  var all=[].slice.call(document.querySelectorAll('.slide'));
+  var frame=demoSlide.querySelector('#dframe'),warn=demoSlide.querySelector('#dwarn');
+  var dtitle=demoSlide.querySelector('#dtitle'),dnote=demoSlide.querySelector('#dnote'),dopen=demoSlide.querySelector('#dopen');
+  function showDemo(key){
+    var d=DEMOS[key];if(!d)return;
+    dtitle.textContent=d.title;dnote.textContent=d.note;dopen.href=d.url;
+    frame.src=d.url;warn.style.display='none';
+    frame.addEventListener('load',function(){warn.style.display='none';},{once:true});
+    setTimeout(function(){if(!frame.src)warn.style.display='block'},3500);
+    var idx=all.indexOf(demoSlide);
+    if(idx>-1){goTo(idx);}
+  }
+  function goTo(i){
+    var btns=document.querySelectorAll('#rail button');
+    if(btns[i])btns[i].click();
+  }
+  demoSlide.querySelector('#dback').addEventListener('click',function(){frame.src='about:blank';goTo(all.indexOf(slides[9])>-1?9:0);});
+  window.showDemo=showDemo;
+
+  /* 4 · Screenshot open behaviour: static deck keeps zoom; live ones go to demo on double click */
+  document.addEventListener('dblclick',function(e){
+    var live=e.target.closest('.shot.live');
+    if(live){e.stopPropagation();showDemo(live.getAttribute('data-demo'));}
+  },true);
+
+  /* 5 · Print / export to PDF keeps one slide per page */
+  var st=document.createElement('style');
+  st.textContent='@media print{.slide{position:relative!important;opacity:1!important;transform:none!important;'+
+    'page-break-after:always;break-after:page;height:auto;min-height:60vh;padding:24px}'+
+    '#bg,#rail,.hud,.bottom-chrome,.shot-actions,.swipe-hint,.mobile-note{display:none!important}'+
+    '.rv{opacity:1!important;transform:none!important}.demo-slide{display:none!important}}';
+  document.head.appendChild(st);
 })();
 </script>
 
